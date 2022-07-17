@@ -1,14 +1,13 @@
 package controller
 
 import (
-	"net/http"
-	"strconv"
-
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/ydhnwb/golang_api/dto"
 	"github.com/ydhnwb/golang_api/entity"
 	"github.com/ydhnwb/golang_api/helper"
 	"github.com/ydhnwb/golang_api/service"
+	"net/http"
 )
 
 //AuthController interface is a contract what this controller can do
@@ -40,7 +39,7 @@ func (c *authController) Login(ctx *gin.Context) {
 	}
 	authResult := c.authService.VerifyCredential(loginDTO.Email, loginDTO.Password)
 	if v, ok := authResult.(entity.User); ok {
-		generatedToken := c.jwtService.GenerateToken(strconv.FormatUint(v.ID, 10))
+		generatedToken := c.jwtService.GenerateToken(v)
 		v.Token = generatedToken
 		response := helper.BuildResponse(true, "OK!", v)
 		ctx.JSON(http.StatusOK, response)
@@ -52,6 +51,13 @@ func (c *authController) Login(ctx *gin.Context) {
 
 func (c *authController) Register(ctx *gin.Context) {
 	var registerDTO dto.RegisterDTO
+	token, _ := ctx.Get("Claim")
+	claims := token.(jwt.MapClaims)
+	if claims["role"] != "admin" {
+		response := helper.BuildErrorResponse("Failed to process request", "Usuario no autorizado para relizar esta accion", nil)
+		ctx.AbortWithStatusJSON(http.StatusForbidden, response)
+		return
+	}
 	errDTO := ctx.ShouldBind(&registerDTO)
 	if errDTO != nil {
 		response := helper.BuildErrorResponse("Failed to process request", errDTO.Error(), helper.EmptyObj{})
@@ -59,12 +65,19 @@ func (c *authController) Register(ctx *gin.Context) {
 		return
 	}
 
+	role := c.authService.RoleExist(registerDTO.Role)
 	if !c.authService.IsDuplicateEmail(registerDTO.Email) {
 		response := helper.BuildErrorResponse("Failed to process request", "Duplicate email", helper.EmptyObj{})
 		ctx.JSON(http.StatusConflict, response)
+	} else if role == nil {
+		response := helper.BuildErrorResponse("Failed to process request", "Role not Exist", helper.EmptyObj{})
+		ctx.JSON(http.StatusConflict, response)
+	} else if c.authService.DriverExist(registerDTO.Driver.DriverFile) {
+		response := helper.BuildErrorResponse("Failed to process request", "Driver already Exist", helper.EmptyObj{})
+		ctx.JSON(http.StatusConflict, response)
 	} else {
-		createdUser := c.authService.CreateUser(registerDTO)
-		token := c.jwtService.GenerateToken(strconv.FormatUint(createdUser.ID, 10))
+		createdUser := c.authService.CreateUser(registerDTO, role.ID)
+		token := c.jwtService.GenerateToken(createdUser)
 		createdUser.Token = token
 		response := helper.BuildResponse(true, "OK!", createdUser)
 		ctx.JSON(http.StatusCreated, response)

@@ -32,6 +32,7 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 func (db *userConnection) InsertUser(user entity.User) entity.User {
 	user.Password = hashAndSalt([]byte(user.Password))
 	db.connection.Save(&user)
+	db.connection.Preload("Role").Find(&user)
 	return user
 }
 
@@ -50,7 +51,7 @@ func (db *userConnection) UpdateUser(user entity.User) entity.User {
 
 func (db *userConnection) VerifyCredential(email string, password string) interface{} {
 	var user entity.User
-	res := db.connection.Where("email = ?", email).Take(&user)
+	res := db.connection.Preload("Roles").Where("email = ?", email).Take(&user)
 	if res.Error == nil {
 		return user
 	}
@@ -59,7 +60,7 @@ func (db *userConnection) VerifyCredential(email string, password string) interf
 
 func (db *userConnection) IsDuplicateEmail(email string) (tx *gorm.DB) {
 	var user entity.User
-	return db.connection.Where("email = ?", email).Take(&user)
+	return db.connection.Preload("Roles").Where("email = ?", email).Take(&user)
 }
 
 func (db *userConnection) FindByEmail(email string) entity.User {
@@ -70,7 +71,7 @@ func (db *userConnection) FindByEmail(email string) entity.User {
 
 func (db *userConnection) ProfileUser(userID string) entity.User {
 	var user entity.User
-	db.connection.Preload("Books").Preload("Books.User").Find(&user, userID)
+	db.connection.Preload("Roles").Find(&user, userID)
 	return user
 }
 

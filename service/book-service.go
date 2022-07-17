@@ -12,59 +12,59 @@ import (
 
 //BookService is a ....
 type BookService interface {
-	Insert(b dto.BookCreateDTO) entity.Book
-	Update(b dto.BookUpdateDTO) entity.Book
-	Delete(b entity.Book)
-	All() []entity.Book
-	FindByID(bookID uint64) entity.Book
+	Insert(b dto.BookCreateDTO) entity.Driver
+	Update(b dto.BookUpdateDTO) entity.Driver
+	Delete(b entity.Driver)
+	All() []entity.Driver
+	FindByID(bookID uint64) entity.Driver
 	IsAllowedToEdit(userID string, bookID uint64) bool
 }
 
 type bookService struct {
-	bookRepository repository.BookRepository
+	bookRepository repository.DriverRepository
 }
 
 //NewBookService .....
-func NewBookService(bookRepo repository.BookRepository) BookService {
+func NewBookService(bookRepo repository.DriverRepository) BookService {
 	return &bookService{
 		bookRepository: bookRepo,
 	}
 }
 
-func (service *bookService) Insert(b dto.BookCreateDTO) entity.Book {
-	book := entity.Book{}
+func (service *bookService) Insert(b dto.BookCreateDTO) entity.Driver {
+	book := entity.Driver{}
 	err := smapping.FillStruct(&book, smapping.MapFields(&b))
 	if err != nil {
 		log.Fatalf("Failed map %v: ", err)
 	}
-	res := service.bookRepository.InsertBook(book)
+	res := service.bookRepository.InsertDriver(book)
 	return res
 }
 
-func (service *bookService) Update(b dto.BookUpdateDTO) entity.Book {
-	book := entity.Book{}
+func (service *bookService) Update(b dto.BookUpdateDTO) entity.Driver {
+	book := entity.Driver{}
 	err := smapping.FillStruct(&book, smapping.MapFields(&b))
 	if err != nil {
 		log.Fatalf("Failed map %v: ", err)
 	}
-	res := service.bookRepository.UpdateBook(book)
+	res := service.bookRepository.UpdateDriver(book)
 	return res
 }
 
-func (service *bookService) Delete(b entity.Book) {
-	service.bookRepository.DeleteBook(b)
+func (service *bookService) Delete(b entity.Driver) {
+	service.bookRepository.DeleteDriver(b)
 }
 
-func (service *bookService) All() []entity.Book {
-	return service.bookRepository.AllBook()
+func (service *bookService) All() []entity.Driver {
+	return service.bookRepository.AllDriver()
 }
 
-func (service *bookService) FindByID(bookID uint64) entity.Book {
-	return service.bookRepository.FindBookByID(bookID)
+func (service *bookService) FindByID(bookID uint64) entity.Driver {
+	return service.bookRepository.FindDriverByID(bookID)
 }
 
 func (service *bookService) IsAllowedToEdit(userID string, bookID uint64) bool {
-	b := service.bookRepository.FindBookByID(bookID)
+	b := service.bookRepository.FindDriverByID(bookID)
 	id := fmt.Sprintf("%v", b.UserID)
 	return userID == id
 }

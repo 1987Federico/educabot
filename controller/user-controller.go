@@ -57,13 +57,14 @@ func (c *userController) Update(context *gin.Context) {
 }
 
 func (c *userController) Profile(context *gin.Context) {
-	authHeader := context.GetHeader("Authorization")
-	token, err := c.jwtService.ValidateToken(authHeader)
-	if err != nil {
-		panic(err.Error())
-	}
-	claims := token.Claims.(jwt.MapClaims)
+	token, _ := context.Get("Claim")
+	claims := token.(jwt.MapClaims)
 	id := fmt.Sprintf("%v", claims["user_id"])
+	if claims["role"] != "admin" {
+		response := helper.BuildErrorResponse("Failed to process request", "Usuario no autorizado para relizar esta accion", nil)
+		context.AbortWithStatusJSON(http.StatusForbidden, response)
+		return
+	}
 	user := c.userService.Profile(id)
 	res := helper.BuildResponse(true, "OK", user)
 	context.JSON(http.StatusOK, res)

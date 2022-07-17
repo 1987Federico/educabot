@@ -11,16 +11,17 @@ import (
 )
 
 var (
-	db             *gorm.DB                  = config.SetupDatabaseConnection()
-	userRepository repository.UserRepository = repository.NewUserRepository(db)
-	bookRepository repository.BookRepository = repository.NewBookRepository(db)
-	jwtService     service.JWTService        = service.NewJWTService()
-	userService    service.UserService       = service.NewUserService(userRepository)
-	bookService    service.BookService       = service.NewBookService(bookRepository)
-	authService    service.AuthService       = service.NewAuthService(userRepository)
-	authController controller.AuthController = controller.NewAuthController(authService, jwtService)
-	userController controller.UserController = controller.NewUserController(userService, jwtService)
-	bookController controller.BookController = controller.NewBookController(bookService, jwtService)
+	db               *gorm.DB                    = config.SetupDatabaseConnection()
+	userRepository   repository.UserRepository   = repository.NewUserRepository(db)
+	roleRepository   repository.RoleRepository   = repository.NewRoleRepository(db)
+	driverRepository repository.DriverRepository = repository.NewDriverRepository(db)
+	jwtService       service.JWTService          = service.NewJWTService()
+	userService      service.UserService         = service.NewUserService(userRepository)
+	bookService      service.BookService         = service.NewBookService(driverRepository)
+	authService      service.AuthService         = service.NewAuthService(userRepository, roleRepository, driverRepository)
+	authController   controller.AuthController   = controller.NewAuthController(authService, jwtService)
+	userController   controller.UserController   = controller.NewUserController(userService, jwtService)
+	bookController   controller.BookController   = controller.NewBookController(bookService, jwtService)
 )
 
 func main() {
@@ -30,11 +31,12 @@ func main() {
 	authRoutes := r.Group("api/auth")
 	{
 		authRoutes.POST("/login", authController.Login)
-		authRoutes.POST("/register", authController.Register)
 	}
 
 	userRoutes := r.Group("api/user").Use(middleware.AuthorizeJWT(jwtService))
 	{
+		userRoutes.POST("/register/driver", authController.Register)
+		userRoutes.POST("/role", userController.Profile)
 		userRoutes.GET("/profile", userController.Profile)
 		userRoutes.PUT("/profile", userController.Update)
 	}

@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"github.com/ydhnwb/golang_api/entity"
 	"os"
 	"time"
 
@@ -10,12 +11,13 @@ import (
 
 //JWTService is a contract of what jwtService can do
 type JWTService interface {
-	GenerateToken(userID string) string
+	GenerateToken(user entity.User) string
 	ValidateToken(token string) (*jwt.Token, error)
 }
 
 type jwtCustomClaim struct {
 	UserID string `json:"user_id"`
+	Role   string `json:"role"`
 	jwt.StandardClaims
 }
 
@@ -40,9 +42,10 @@ func getSecretKey() string {
 	return secretKey
 }
 
-func (j *jwtService) GenerateToken(UserID string) string {
+func (j *jwtService) GenerateToken(user entity.User) string {
 	claims := &jwtCustomClaim{
-		UserID,
+		fmt.Sprintf("%d", user.ID),
+		user.Roles.Name,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().AddDate(1, 0, 0).Unix(),
 			Issuer:    j.issuer,
