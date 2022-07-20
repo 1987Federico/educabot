@@ -37,7 +37,7 @@ func NewJWTService() *JwtServices {
 func getSecretKey() string {
 	secretKey := os.Getenv("JWT_SECRET")
 	if secretKey != "" {
-		secretKey = "ydhnwb"
+		secretKey = "fede"
 	}
 	return secretKey
 }
