@@ -1,11 +1,17 @@
 # Educabot Challenge
 Please refer to the newest repository instead, here:  
 ```
-my git lab
+https://gitlab.com/federicomatias.aguero1987
 ```
 
 ## Prerequisites
+you should create an .env file with the following variables
+* DB_USER= postgres
+* DB_HOST= the host of your database
+* DB_NAME= the name of your database
+* DB_PORT= the port of your database
 
+## Libraries
 * Golang 1.15.x
 * jwt-go 
 * gin v1.6.3
@@ -66,5 +72,4 @@ Structure project
 │   │   │    ├──utils.go
 ├── go.mod
 ├── go.sum
-
 ```

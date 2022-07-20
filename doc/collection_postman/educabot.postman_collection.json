@@ -1,0 +1,304 @@
+{
+	"info": {
+		"_postman_id": "0b6779a5-bf3c-4a22-8cda-ee979c8c0e9a",
+		"name": "educabot",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTY4OTY0MjQxNiwiaWF0IjoxNjU4MTA2NDE2LCJpc3MiOiJ5ZGhud2IifQ.9Q5DPQu3W5DdvxkRE5rG7VbvtCrIUqWPKOxpTK3gY9k",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"Email\":\"a@email.com\",\n    \"Password\":\"secret\",\n    \"Name\":\"fede Men\",\n    \"role_name\":\"driver\",\n    \"driver\":{\n        \"driver_file\":123457,\n        \"description\":\"driver of test\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/user/register/driver",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"user",
+								"register",
+								"driver"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"Email\":\"test@gmail.com\",\n    \"Password\":\"tests\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetProfileUSer",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNCIsInJvbGUiOiJkcml2ZXIiLCJleHAiOjE2ODk1NjIxMTMsImlhdCI6MTY1ODAyNjExMywiaXNzIjoieWRobndiIn0.l-oWjdmbib8xcxgIeTjdein9JB3UtQKjCl1YwdcLDcQ",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/user/profile",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"user",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "driver",
+			"item": [
+				{
+					"name": "Driver-All",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTY4OTY0MjQxNiwiaWF0IjoxNjU4MTA2NDE2LCJpc3MiOiJ5ZGhud2IifQ.9Q5DPQu3W5DdvxkRE5rG7VbvtCrIUqWPKOxpTK3gY9k",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "http://localhost:8080/challenge/educabot/api/driver?offset=0&limit=100",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"challenge",
+								"educabot",
+								"api",
+								"driver"
+							],
+							"query": [
+								{
+									"key": "offset",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "100"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Driver-ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTY4OTY0MjQxNiwiaWF0IjoxNjU4MTA2NDE2LCJpc3MiOiJ5ZGhud2IifQ.9Q5DPQu3W5DdvxkRE5rG7VbvtCrIUqWPKOxpTK3gY9k",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/challenge/educabot/api/driver/id=1?id=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"challenge",
+								"educabot",
+								"api",
+								"driver",
+								"id=1"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "trip",
+			"item": [
+				{
+					"name": "assignTripToDriver",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTY4OTY0MjQxNiwiaWF0IjoxNjU4MTA2NDE2LCJpc3MiOiJ5ZGhud2IifQ.9Q5DPQu3W5DdvxkRE5rG7VbvtCrIUqWPKOxpTK3gY9k"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"driver_file\": 123456\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/challenge/educabot/api/trip/assign/driver",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"challenge",
+								"educabot",
+								"api",
+								"trip",
+								"assign",
+								"driver"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "close-trip",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTY4OTY0MjQxNiwiaWF0IjoxNjU4MTA2NDE2LCJpc3MiOiJ5ZGhud2IifQ.9Q5DPQu3W5DdvxkRE5rG7VbvtCrIUqWPKOxpTK3gY9k"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/challenge/educabot/api/trip/close/driver?id=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"challenge",
+								"educabot",
+								"api",
+								"trip",
+								"close",
+								"driver"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "driver_withOut_trip",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTY4OTcwOTUzNiwiaWF0IjoxNjU4MTczNTM2LCJpc3MiOiJ5ZGhud2IifQ.j0q-T-EqBGcg5XQ8TA6w7Tb2StajPDJXQtFzJBuRLdQ",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/challenge/educabot/api/trip/driver/without/progress",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"challenge",
+								"educabot",
+								"api",
+								"trip",
+								"driver",
+								"without",
+								"progress"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
