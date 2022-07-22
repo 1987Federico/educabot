@@ -1,10 +1,13 @@
 package service
 
 import (
+	"context"
+	"errors"
 	"github.com/fede/golang_api/internal/domain/dto"
 	entity2 "github.com/fede/golang_api/internal/domain/entity"
-	"github.com/fede/golang_api/internal/platform/helper/errors"
+	"github.com/fede/golang_api/internal/platform/helper/errorCustom"
 	repository2 "github.com/fede/golang_api/internal/platform/storage/repository"
+	"gorm.io/gorm"
 	"log"
 
 	"golang.org/x/crypto/bcrypt"
@@ -12,12 +15,12 @@ import (
 
 //AuthService is a contract about something that this service can do
 type AuthService interface {
-	VerifyCredential(email string, password string) interface{}
-	CreateUser(user dto.RegisterDTO, roleID uint64) entity2.User
-	FindByEmail(email string) entity2.User
-	IsDuplicateEmail(email string) bool
-	RoleExist(name string) *entity2.Role
-	DriverExist(driverFile uint64) bool
+	VerifyCredential(email string, password string, ctx context.Context) interface{}
+	CreateUser(user dto.RegisterDTO, roleID uint64, ctx context.Context) entity2.User
+	FindByEmail(email string, ctx context.Context) entity2.User
+	IsDuplicateEmail(email string, ctx context.Context) bool
+	RoleExist(name string, ctx context.Context) *entity2.Role
+	DriverExist(driverFile uint64, ctx context.Context) bool
 }
 
 type AuthServices struct {
@@ -35,8 +38,8 @@ func NewAuthService(userRep *repository2.UserConnection, roleRep *repository2.Ro
 	}
 }
 
-func (service *AuthServices) VerifyCredential(email string, password string) interface{} {
-	res := service.userRepository.VerifyCredential(email, password)
+func (service *AuthServices) VerifyCredential(email string, password string, ctx context.Context) interface{} {
+	res := service.userRepository.VerifyCredential(email, password, ctx)
 	if v, ok := res.(entity2.User); ok {
 		comparedPassword := comparePassword(v.Password, []byte(password))
 		if v.Email == email && comparedPassword {
@@ -47,7 +50,7 @@ func (service *AuthServices) VerifyCredential(email string, password string) int
 	return false
 }
 
-func (service *AuthServices) CreateUser(user dto.RegisterDTO, roleID uint64) entity2.User {
+func (service *AuthServices) CreateUser(user dto.RegisterDTO, roleID uint64, ctx context.Context) entity2.User {
 	userToCreate := entity2.User{
 		Name:     user.Name,
 		Email:    user.Email,
@@ -59,34 +62,34 @@ func (service *AuthServices) CreateUser(user dto.RegisterDTO, roleID uint64) ent
 			Description: user.Driver.Description,
 		},
 	}
-	res := service.userRepository.InsertUser(userToCreate)
+	res := service.userRepository.InsertUser(userToCreate, ctx)
 	return res
 }
 
-func (service *AuthServices) FindByEmail(email string) entity2.User {
-	return service.userRepository.FindByEmail(email)
+func (service *AuthServices) FindByEmail(email string, ctx context.Context) entity2.User {
+	return service.userRepository.FindByEmail(email, ctx)
 }
 
-func (service *AuthServices) IsDuplicateEmail(email string) bool {
-	res := service.userRepository.IsDuplicateEmail(email)
-	if res.Error != nil {
-		panic(errors.ConflictApiError("Failed to process request", "Duplicate email"))
+func (service *AuthServices) IsDuplicateEmail(email string, ctx context.Context) bool {
+	err := service.userRepository.IsDuplicateEmail(email, ctx)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		panic(errorCustom.ConflictApiError("Failed to process request", "Duplicate email"))
 	}
 	return false
 }
 
-func (service *AuthServices) RoleExist(name string) *entity2.Role {
-	res := service.roleRepository.FindByRole(name)
+func (service *AuthServices) RoleExist(name string, ctx context.Context) *entity2.Role {
+	res := service.roleRepository.FindByRole(name, ctx)
 	if res == nil {
-		panic(errors.ConflictApiError("Failed to process request", "Role not Exist"))
+		panic(errorCustom.ConflictApiError("Failed to process request", "Role not Exist"))
 	}
 	return res
 }
 
-func (service *AuthServices) DriverExist(driverFile uint64) bool {
-	res := service.driverRepository.FindDriverByFile(driverFile)
+func (service *AuthServices) DriverExist(driverFile uint64, ctx context.Context) bool {
+	res := service.driverRepository.FindDriverByFile(driverFile, ctx)
 	if res != nil {
-		panic(errors.ConflictApiError("Failed to process request", "Driver already Exist"))
+		panic(errorCustom.ConflictApiError("Failed to process request", "Driver already Exist"))
 	}
 	return false
 }

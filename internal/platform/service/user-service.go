@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"github.com/fede/golang_api/internal/domain/dto"
 	"github.com/fede/golang_api/internal/domain/entity"
 	"github.com/fede/golang_api/internal/platform/storage/repository"
@@ -26,16 +27,16 @@ func NewUserService(userRepo *repository.UserConnection) *UserServices {
 	}
 }
 
-func (service *UserServices) Update(user dto.UserUpdateDTO) entity.User {
+func (service *UserServices) Update(user dto.UserUpdateDTO, ctx context.Context) entity.User {
 	userToUpdate := entity.User{}
 	err := smapping.FillStruct(&userToUpdate, smapping.MapFields(&user))
 	if err != nil {
 		log.Fatalf("Failed map %v:", err)
 	}
-	updatedUser := service.userRepository.UpdateUser(userToUpdate)
+	updatedUser := service.userRepository.UpdateUser(userToUpdate, ctx)
 	return updatedUser
 }
 
-func (service *UserServices) Profile(userID string) entity.User {
-	return service.userRepository.ProfileUser(userID)
+func (service *UserServices) Profile(userID string, ctx context.Context) entity.User {
+	return service.userRepository.ProfileUser(userID, ctx)
 }

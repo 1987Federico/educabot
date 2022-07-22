@@ -1,14 +1,16 @@
 package repository
 
 import (
+	"context"
 	"github.com/fede/golang_api/internal/domain/entity"
+	"github.com/fede/golang_api/internal/platform/storage"
 	"gorm.io/gorm"
 )
 
 type RoleRepository interface {
-	InsertRole(user entity.Role) entity.Role
-	IsDuplicateRole(role string) (tx *gorm.DB)
-	FindByRole(name string) *entity.Role
+	InsertRole(user entity.Role, ctx context.Context) entity.Role
+	IsDuplicateRole(role string, ctx context.Context) error
+	FindByRole(name string, ctx context.Context) *entity.Role
 }
 
 type RoleConnection struct {
@@ -22,18 +24,22 @@ func NewRoleRepository(db *gorm.DB) *RoleConnection {
 	}
 }
 
-func (db *RoleConnection) InsertRole(role entity.Role) entity.Role {
-	db.connection.Save(&role)
+func (r *RoleConnection) InsertRole(role entity.Role, ctx context.Context) entity.Role {
+	db := storage.FromContext(ctx)
+	db.Save(&role)
 	return role
 }
 
-func (db *RoleConnection) IsDuplicateRole(name string) (tx *gorm.DB) {
+func (r *RoleConnection) IsDuplicateRole(name string, ctx context.Context) error {
 	var role entity.Role
-	return db.connection.Where("name = ?", name).Take(&role)
+	db := storage.FromContext(ctx)
+	err := db.Where("name = ?", name).Take(&role).Error
+	return err
 }
 
-func (db *RoleConnection) FindByRole(name string) *entity.Role {
+func (r *RoleConnection) FindByRole(name string, ctx context.Context) *entity.Role {
 	var role entity.Role
-	db.connection.Where("name = ?", name).Take(&role)
+	db := storage.FromContext(ctx)
+	db.Where("name = ?", name).Take(&role)
 	return &role
 }

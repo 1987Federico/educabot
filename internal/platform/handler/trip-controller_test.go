@@ -29,12 +29,6 @@ func newTripHandler() *TripControllers {
 }
 
 func TestCloseTripToDriverOK(t *testing.T) {
-	var (
-	//	resp entity.Trip
-	)
-
-	//_ = json.Unmarshal(responseSuccess, &resp)
-
 	handler := newTripHandler()
 	response, contextTest := kit.GetTestConfig(http.MethodPost, "/close/driver?id=1", nil, nil)
 

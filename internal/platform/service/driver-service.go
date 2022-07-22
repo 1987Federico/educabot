@@ -1,18 +1,19 @@
 package service
 
 import (
+	"context"
 	"github.com/fede/golang_api/internal/domain/dto"
 	"github.com/fede/golang_api/internal/domain/entity"
-	"github.com/fede/golang_api/internal/platform/helper/errors"
+	"github.com/fede/golang_api/internal/platform/helper/errorCustom"
 	"github.com/fede/golang_api/internal/platform/storage/repository"
 )
 
 //DriverService is a ....
 type DriverService interface {
-	All(pagination dto.DriverSearch) []entity.Driver
-	FindByID(bookID uint64) *entity.Driver
-	DriverExist(driverFile uint64) *entity.Driver
-	DriversWithoutTripsProgress() *[]entity.Driver
+	AllDriver(pagination dto.DriverSearch, ctx context.Context) []entity.Driver
+	FindByID(bookID uint64, ctx context.Context) *entity.Driver
+	DriverExist(driverFile uint64, ctx context.Context) *entity.Driver
+	DriversWithoutTripsProgress(ctx context.Context) *[]entity.Driver
 }
 
 type DriverServices struct {
@@ -26,30 +27,30 @@ func NewDriverService(driverRepo *repository.DriverConnection) *DriverServices {
 	}
 }
 
-func (s *DriverServices) All(pagination dto.DriverSearch) []entity.Driver {
-	return s.driverRepository.AllDriver(pagination.Offset, pagination.Limit)
+func (s *DriverServices) AllDriver(pagination dto.DriverSearch, ctx context.Context) []entity.Driver {
+	return s.driverRepository.AllDriver(pagination.Offset, pagination.Limit, ctx)
 }
 
-func (s *DriverServices) FindByID(driverID uint64) *entity.Driver {
-	resp := s.driverRepository.FindDriverByID(driverID)
+func (s *DriverServices) FindByID(driverID uint64, ctx context.Context) *entity.Driver {
+	resp := s.driverRepository.FindDriverByID(driverID, ctx)
 	if resp == nil {
-		panic(errors.NotFoundApiError("Data not found", "No data with given id"))
+		panic(errorCustom.NotFoundApiError("Data not found", "No data with given id"))
 	}
 	return resp
 }
 
-func (s *DriverServices) DriverExist(driverFile uint64) *entity.Driver {
-	res := s.driverRepository.FindDriverByFile(driverFile)
+func (s *DriverServices) DriverExist(driverFile uint64, ctx context.Context) *entity.Driver {
+	res := s.driverRepository.FindDriverByFile(driverFile, ctx)
 	if res == nil {
-		panic(errors.NotFoundApiError("The driver with the requested file does not exist", "not found"))
+		panic(errorCustom.NotFoundApiError("The driver with the requested file does not exist", "not found"))
 	}
 	return res
 }
 
-func (s *DriverServices) DriversWithoutTripsProgress() *[]entity.Driver {
-	trip := s.driverRepository.DriversWithoutTripsProgress()
+func (s *DriverServices) DriversWithoutTripsProgress(ctx context.Context) *[]entity.Driver {
+	trip := s.driverRepository.DriversWithoutTripsProgress(ctx)
 	if len(*trip) == 0 {
-		panic(errors.NotFoundApiError("not found driver", "No drivers available"))
+		panic(errorCustom.NotFoundApiError("not found driver", "No drivers available"))
 	}
 	return trip
 }

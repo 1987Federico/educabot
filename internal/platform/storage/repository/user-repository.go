@@ -1,19 +1,21 @@
 package repository
 
 import (
+	"context"
 	"github.com/fede/golang_api/internal/domain/entity"
+	"github.com/fede/golang_api/internal/platform/storage"
 	"github.com/fede/golang_api/internal/platform/utils"
 	"gorm.io/gorm"
 )
 
 //UserRepository is contract what userRepository can do to db
 type UserRepository interface {
-	InsertUser(user entity.User) entity.User
-	UpdateUser(user entity.User) entity.User
-	VerifyCredential(email string, password string) interface{}
-	IsDuplicateEmail(email string) (tx *gorm.DB)
-	FindByEmail(email string) entity.User
-	ProfileUser(userID string) entity.User
+	InsertUser(user entity.User, ctx context.Context) entity.User
+	UpdateUser(user entity.User, ctx context.Context) entity.User
+	VerifyCredential(email string, password string, ctx context.Context) interface{}
+	IsDuplicateEmail(email string, ctx context.Context) error
+	FindByEmail(email string, ctx context.Context) entity.User
+	ProfileUser(userID string, ctx context.Context) entity.User
 }
 
 type UserConnection struct {
@@ -27,48 +29,55 @@ func NewUserRepository(db *gorm.DB) *UserConnection {
 	}
 }
 
-func (db *UserConnection) InsertUser(user entity.User) entity.User {
+func (u *UserConnection) InsertUser(user entity.User, ctx context.Context) entity.User {
 	user.Password = utils.HashAndSalt([]byte(user.Password))
-	db.connection.Save(&user)
-	db.connection.Preload("Roles").Find(&user)
+	db := storage.FromContext(ctx)
+	db.Save(&user)
+	db.Preload("Roles").Find(&user)
 	return user
 }
 
-func (db *UserConnection) UpdateUser(user entity.User) entity.User {
+func (u *UserConnection) UpdateUser(user entity.User, ctx context.Context) entity.User {
+	db := storage.FromContext(ctx)
 	if user.Password != "" {
 		user.Password = utils.HashAndSalt([]byte(user.Password))
 	} else {
 		var tempUser entity.User
-		db.connection.Find(&tempUser, user.ID)
+		db.Find(&tempUser, user.ID)
 		user.Password = tempUser.Password
 	}
 
-	db.connection.Save(&user)
+	db.Save(&user)
 	return user
 }
 
-func (db *UserConnection) VerifyCredential(email string, password string) interface{} {
+func (u *UserConnection) VerifyCredential(email string, password string, ctx context.Context) interface{} {
 	var user entity.User
-	res := db.connection.Preload("Roles").Where("email = ?", email).Take(&user)
+	db := storage.FromContext(ctx)
+	res := db.Preload("Roles").Where("email = ?", email).Take(&user)
 	if res.Error == nil {
 		return user
 	}
 	return nil
 }
 
-func (db *UserConnection) IsDuplicateEmail(email string) (tx *gorm.DB) {
+func (u *UserConnection) IsDuplicateEmail(email string, ctx context.Context) error {
 	var user entity.User
-	return db.connection.Preload("Roles").Where("email = ?", email).Take(&user)
+	db := storage.FromContext(ctx)
+	err := db.Preload("Roles").Where("email = ?", email).Take(&user).Error
+	return err
 }
 
-func (db *UserConnection) FindByEmail(email string) entity.User {
+func (u *UserConnection) FindByEmail(email string, ctx context.Context) entity.User {
 	var user entity.User
-	db.connection.Where("email = ?", email).Take(&user)
+	db := storage.FromContext(ctx)
+	db.Where("email = ?", email).Take(&user)
 	return user
 }
 
-func (db *UserConnection) ProfileUser(userID string) entity.User {
+func (u *UserConnection) ProfileUser(userID string, ctx context.Context) entity.User {
 	var user entity.User
-	db.connection.Preload("Roles").Find(&user, userID)
+	db := storage.FromContext(ctx)
+	db.Preload("Roles").Find(&user, userID)
 	return user
 }

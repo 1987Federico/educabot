@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/fede/golang_api/internal/platform/helper/errors"
+	"github.com/fede/golang_api/internal/platform/helper/errorCustom"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"net/http"
@@ -38,13 +38,13 @@ func (h *Error) recovery(ctx *gin.Context) {
 		case error:
 			h.abortWithAPIError(ctx, er)
 		default:
-			h.logger.Error("Recovery from panic with errors: ", er)
-			ctx.AbortWithStatusJSON(http.StatusInternalServerError, errors.InternalServerApiError("unknown error", "An errors occurred"))
+			h.logger.Error("Recovery from panic with errorCustom: ", er)
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, errorCustom.InternalServerApiError("unknown error", "An errorCustom occurred"))
 		}
 	}
 }
 
 func (h *Error) abortWithAPIError(ctx *gin.Context, err error) {
-	h.logger.Errorf("errors: %v ", err)
-	errors.RespondError(ctx, err)
+	h.logger.Errorf("errorCustom: %v ", err)
+	errorCustom.RespondError(ctx, err)
 }

@@ -1,4 +1,4 @@
-package errors
+package errorCustom
 
 import (
 	"errors"
@@ -22,10 +22,10 @@ func (e ApiError) GetStatus() int {
 
 func (e ApiError) toMap() map[string]interface{} {
 	return map[string]interface{}{
-		"message": e.message,
-		"errors":  e.error,
-		"status":  e.Status,
-		"cause":   e.cause,
+		"message":     e.message,
+		"errorCustom": e.error,
+		"status":      e.Status,
+		"cause":       e.cause,
 	}
 }
 

@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"github.com/dgrijalva/jwt-go"
-	"github.com/fede/golang_api/internal/platform/helper/errors"
+	"github.com/fede/golang_api/internal/platform/helper/errorCustom"
 	"github.com/fede/golang_api/internal/platform/service"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -22,7 +22,7 @@ func NewAuthorizeJWT(jwtService *service.JwtServices) *AuthJWT {
 func (auth *AuthJWT) AuthorizeJWT(c *gin.Context) {
 	authHeader := c.GetHeader("Authorization")
 	if authHeader == "" {
-		panic(errors.BadRequestApiError("Failed to process request", "No token found"))
+		panic(errorCustom.BadRequestApiError("Failed to process request", "No token found"))
 		return
 	}
 	token, err := auth.jwtService.ValidateToken(authHeader)
@@ -33,6 +33,6 @@ func (auth *AuthJWT) AuthorizeJWT(c *gin.Context) {
 		log.Println("Claim[issuer] :", claims["issuer"])
 	} else {
 		log.Println(err)
-		panic(errors.StatusUnauthorizedApiError("Token is not valid", err.Error()))
+		panic(errorCustom.StatusUnauthorizedApiError("Token is not valid", err.Error()))
 	}
 }
