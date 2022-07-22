@@ -1,0 +1,393 @@
+basePath: /challenge/educabot
+definitions:
+  dto.DriverDTO:
+    properties:
+      description:
+        type: string
+      driver_file:
+        type: integer
+    required:
+    - driver_file
+    type: object
+  dto.LoginDTO:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  dto.RegisterDTO:
+    properties:
+      driver:
+        $ref: '#/definitions/dto.DriverDTO'
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      role_name:
+        type: string
+    required:
+    - driver
+    - email
+    - name
+    - password
+    - role_name
+    type: object
+  dto.Trip:
+    properties:
+      driver_file:
+        type: integer
+    type: object
+  entity.Driver:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      description:
+        type: string
+      driver_file:
+        type: integer
+      id:
+        type: integer
+      trip:
+        items:
+          $ref: '#/definitions/entity.Trip'
+        type: array
+      updatedAt:
+        type: string
+      user:
+        $ref: '#/definitions/entity.User'
+    type: object
+  entity.Role:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      name:
+        type: string
+      updatedAt:
+        type: string
+      user:
+        items:
+          $ref: '#/definitions/entity.User'
+        type: array
+    type: object
+  entity.Trip:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      driver:
+        $ref: '#/definitions/entity.Driver'
+      driver_id:
+        type: integer
+      end_time:
+        type: string
+      finished:
+        type: boolean
+      id:
+        type: integer
+      start_time:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  entity.User:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      driver:
+        $ref: '#/definitions/entity.Driver'
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      role:
+        $ref: '#/definitions/entity.Role'
+      role_id:
+        type: integer
+      token:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  errorCustom.ApiError:
+    properties:
+      status:
+        type: integer
+    type: object
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: federicomatias.celeste@gmail.com
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a challenge to space guru.
+  title: Educabot
+  version: "1.0"
+paths:
+  /api/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: allows a user to authenticate
+      parameters:
+      - description: driver to register
+        in: body
+        name: paramsToSearch
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RegisterDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.LoginDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+      summary: login of users
+      tags:
+      - Drivers
+  /api/driver:
+    get:
+      consumes:
+      - application/json
+      description: returns drivers who do not have a trip in progress
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Driver'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+      summary: Drivers
+      tags:
+      - Drivers
+  /api/driver/{id}:
+    get:
+      consumes:
+      - application/json
+      description: returns a driver searched by his id
+      parameters:
+      - description: driver id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+      summary: returns a driver
+      tags:
+      - Drivers
+  /api/driver/register/driver:
+    post:
+      consumes:
+      - application/json
+      description: register a driver and return it
+      parameters:
+      - description: driver to register
+        in: body
+        name: paramsToSearch
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RegisterDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Driver'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+      summary: register a driver
+      tags:
+      - Drivers
+  /api/trip/assign/driver:
+    post:
+      consumes:
+      - application/json
+      description: assign a trip to a driver who does not have a trip in progress
+      parameters:
+      - description: driver's file to open a trip
+        in: body
+        name: driver
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Trip'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Trip'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+      summary: assign a ride to a driver
+      tags:
+      - Trips
+  /api/trip/close/driver:
+    post:
+      consumes:
+      - application/json
+      description: assign a trip to a driver who does not have a trip in progress
+      parameters:
+      - description: driver's file to open a trip
+        in: body
+        name: driver
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Trip'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Trip'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+      summary: assign a ride to a driver
+      tags:
+      - Trips
+  /api/trip/driver/without/progress:
+    get:
+      consumes:
+      - application/json
+      description: returns drivers who do not have a trip in progress
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Driver'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errorCustom.ApiError'
+      summary: Drivers Without Trips Progress
+      tags:
+      - Drivers
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

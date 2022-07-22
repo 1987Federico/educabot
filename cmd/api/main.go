@@ -23,6 +23,7 @@ func main() {
 	docs.SwaggerInfo.Host = "localhost:8080"
 	docs.SwaggerInfo.BasePath = "/challenge/educabot"
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
+
 	srv := server.NewServer()
 	err := srv.Run()
 	if err != nil {
@@ -30,4 +31,4 @@ func main() {
 	}
 }
 
-//go:generate swag init -g main.go  -o ../../docs/specs/
+//go:generate swag init -g main.go -o ../../docs/specs/ --parseDependency true --parseInternal true

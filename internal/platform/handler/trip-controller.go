@@ -35,13 +35,13 @@ func NewTripController(tripService *service2.TripServices, driverService *servic
 // @Accept  json
 // @Produce json
 // @Param driver body dto.Trip true "driver's file to open a trip"
-// @Success 201 {object} *entity.Trip
+// @Success 201 {object} entity.Trip
 // @Failure 400 {object} errorCustom.ApiError
 // @Failure 401 {object} errorCustom.ApiError
 // @Failure 404 {object} errorCustom.ApiError
 // @Failure 409 {object} errorCustom.ApiError
 // @Failure 500 {object} errorCustom.ApiError
-// @Router /api/trip/assign/driver[post]
+// @Router /api/trip/assign/driver [post]
 func (t TripControllers) AssignTripToDriver(ctx *gin.Context) {
 	var trip dto.Trip
 	token, _ := ctx.Get("Claim")
@@ -70,13 +70,13 @@ func (t TripControllers) AssignTripToDriver(ctx *gin.Context) {
 // @Accept  json
 // @Produce json
 // @Param driver body dto.Trip true "driver's file to open a trip"
-// @Success 201 {object} *entity.Trip
+// @Success 201 {object} entity.Trip
 // @Failure 400 {object} errorCustom.ApiError
 // @Failure 401 {object} errorCustom.ApiError
 // @Failure 404 {object} errorCustom.ApiError
 // @Failure 409 {object} errorCustom.ApiError
 // @Failure 500 {object} errorCustom.ApiError
-// @Router /api/trip/close/driver[post]
+// @Router /api/trip/close/driver [post]
 func (t TripControllers) CloseTripToDriver(ctx *gin.Context) {
 	token, _ := ctx.Get("Claim")
 	claims := token.(jwt.MapClaims)
